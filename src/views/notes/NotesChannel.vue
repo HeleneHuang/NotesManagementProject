@@ -1,0 +1,3 @@
+<template>
+    channel management
+</template>

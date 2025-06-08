@@ -1,0 +1,3 @@
+<template>
+    notes management
+</template>
