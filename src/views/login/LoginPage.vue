@@ -1,7 +1,10 @@
 <script setup>
-import { userRegisterService } from '@/api/user.js'
+import { userRegisterService, userLoginService } from '@/api/user.js'
 import { User, Lock } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { useUserStore } from '@/stores'
+import { useRouter } from 'vue-router'
+import { ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 
 const isRegister = ref(true)
 const form = ref()
@@ -49,6 +52,26 @@ const register = async () => {
     isRegister.value = false
 }
 
+// reset when switch
+watch(isRegister, () => {
+    formModel.value = {
+        username: '',
+        password: '',
+        repassword: ''
+    }
+})
+
+const userStore = useUserStore()
+const router = useRouter()
+
+// validate before login
+const login = async () => {
+    await form.value.validate()
+    const res = await userLoginService(formModel.value)
+    userStore.setToken(res.data.token)
+    ElMessage.success('Login Successfully!')
+    router.push('/')
+}
 </script>
 
 <template>
@@ -83,16 +106,17 @@ const register = async () => {
                     </el-link>
                 </el-form-item>
             </el-form>
-            <el-form ref="form" size="large" autocomplete="off" v-else>
+
+            <el-form :model="formModel" :rules="rules" ref="form" size="large" autocomplete="off" v-else>
                 <el-form-item>
                     <h1>Login</h1>
                 </el-form-item>
-                <el-form-item>
-                    <el-input :prefix-icon="User" placeholder="user name"></el-input>
+                <el-form-item prop='username'>
+                    <el-input v-model="formModel.username" :prefix-icon="User" placeholder="user name"></el-input>
                 </el-form-item>
-                <!-- bind the password -->
-                <el-form-item>
-                    <el-input :prefix-icon="Lock" type="password" placeholder="password"></el-input>
+                <el-form-item prop="password">
+                    <el-input v-model="formModel.password" name="password" :prefix-icon="Lock" type="password"
+                        placeholder="password"></el-input>
                 </el-form-item>
                 <el-form-item class="flex">
                     <div class="flex">
@@ -101,7 +125,7 @@ const register = async () => {
                     </div>
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="button" type="primary" auto-insert-space>Login</el-button>
+                    <el-button @click="login" class="button" type="primary" auto-insert-space>Login</el-button>
                 </el-form-item>
                 <el-form-item class="flex">
                     <el-link type="info" :underline="false" @click="isRegister = true">
