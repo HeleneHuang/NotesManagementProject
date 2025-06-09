@@ -37,6 +37,11 @@ export default defineConfig([
       'vue/no-setup-props-destructure': 'off',
 
       'no-undef': 'error'
+    },
+    globals: {
+      ElMessage: 'readonly',
+      ElMessageBox: 'readonly',
+      ElLoading: 'readonly'
     }
   },
 
