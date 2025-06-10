@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { notesGetChannelsService } from '@/api/notes.js'
+import { notesGetChannelsService, notesDelChannelService } from '@/api/notes.js'
 import ChannelEdit from './components/ChannelEdit.vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
 
@@ -15,19 +15,29 @@ const getChannelList = async () => {
 }
 getChannelList()
 
-
-const onDelChannel = (row, $index) => {
-    console.log(row, $index)
+const onDelChannel = async (row) => {
+    await ElMessageBox.confirm('Do you want to delete this category?', 'Warning', {
+        type: 'warning',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    })
+    await notesDelChannelService(row.id)
+    ElMessage.success('Deleted Successfully')
+    getChannelList()
 }
+
 const onEditChannel = (row) => {
     dialog.value.open(row)
 }
+
 const onAddChannel = () => {
     dialog.value.open({})
 }
+
 const onSuccess = () => {
     getChannelList()
 }
+
 </script>
 
 <template>

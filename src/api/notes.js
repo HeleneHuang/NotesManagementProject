@@ -8,7 +8,7 @@ export const notesAddChannelService = (data) => request.post('/my/cate/add', dat
 export const notesEditChannelService = (data) => request.put('/my/cate/info', data)
 
 // delete notes categories
-export const artDelChannelService = (id) =>
+export const notesDelChannelService = (id) =>
   request.delete('/my/cate/del', {
     params: { id }
   })
