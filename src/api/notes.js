@@ -12,3 +12,6 @@ export const notesDelChannelService = (id) =>
   request.delete('/my/cate/del', {
     params: { id }
   })
+
+// get the notes list
+export const notesGetListService = (params) => request.get('/my/article/list', { params })
