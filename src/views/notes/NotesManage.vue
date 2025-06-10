@@ -2,6 +2,7 @@
 import { Delete, Edit } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import ChannelSelect from './components/ChannelSelect.vue'
+import NotesEdit from './components/NotesEdit.vue'
 import { notesGetListService } from '@/api/notes'
 import { formatTime } from '@/utils/format'
 
@@ -41,7 +42,6 @@ const onSearch = () => {
     params.value.pagenum = 1
     getNotesList()
 }
-
 const onReset = () => {
     params.value.pagenum = 1
     params.value.cate_id = ''
@@ -49,21 +49,36 @@ const onReset = () => {
     getNotesList()
 }
 
+const notesEditRef = ref()
 // define the logic of edit and delete
+const onAddNotes = () => {
+    notesEditRef.value.open({})
+}
 const onEditNotes = (row) => {
-    console.log(row)
+    notesEditRef.value.open(row)
 }
 const onDeleteNotes = (row) => {
     console.log(row)
 }
+
+// define the function when added and edited successfully
+const onSuccess = (type) => {
+    if (type === 'add') {
+        const lastPage = Math.ceil((total.value + 1) / params.value.pagesize)
+        params.value.pagenum = lastPage
+    }
+    getNotesList()
+}
+
 </script>
 
 <template>
     <page-container title="Notes Management">
         <template #extra>
-            <el-button type="primary"> Add </el-button>
+            <el-button @click="onAddNotes" type="primary"> Add </el-button>
         </template>
 
+        <!-- define the form / header -->
         <el-form inline>
             <el-form-item label="Notes Category：">
                 <channel-select v-model="params.cate_id"></channel-select>
@@ -80,6 +95,7 @@ const onDeleteNotes = (row) => {
             </el-form-item>
         </el-form>
 
+        <!-- define the below table  -->
         <el-table :data="notesList" loading.value=false>
             <el-table-column label="Notes Title" width="400">
                 <template #default="{ row }">
@@ -104,6 +120,10 @@ const onDeleteNotes = (row) => {
             :page-sizes="[2, 3, 5, 10]" layout="jumper, total, sizes, prev, pager, next" :background='true'
             :total="total" @size-change="onSizeChange" @current-change="onCurrentChange"
             style="margin-top: 20px; justify-content: flex-end" />
+
+        <!-- define drawer -->
+        <notes-edit ref="notesEditRef" @success="onSuccess"></notes-edit>
+
     </page-container>
 </template>
 

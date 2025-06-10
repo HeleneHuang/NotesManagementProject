@@ -15,3 +15,6 @@ export const notesDelChannelService = (id) =>
 
 // get the notes list
 export const notesGetListService = (params) => request.get('/my/article/list', { params })
+
+// publish notes
+export const notesPublishService = (data) => request.post('/my/article/add', data)
