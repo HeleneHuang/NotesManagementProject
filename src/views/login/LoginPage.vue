@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
-const isRegister = ref(true)
+const isRegister = ref(false)
 const form = ref()
 
 // define form model

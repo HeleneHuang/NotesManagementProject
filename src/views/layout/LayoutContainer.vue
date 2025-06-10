@@ -12,11 +12,32 @@ import {
 import avatar from '@/assets/default.png'
 import { useUserStore } from '@/stores'
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 
 const userStore = useUserStore()
+const router = useRouter()
+
 onMounted(() => {
     userStore.getUser()
 })
+
+const handleCommand = async (key) => {
+    if (key === 'logout') {
+        await ElMessageBox.confirm('Do you want to exist?', 'Warning', {
+            type: 'warning',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        })
+        // jump out and remove all the info (tokens and user info)
+        userStore.removeToken()
+        userStore.setUser({})
+        router.push('/login')
+    } else {
+        router.push(`/user/${key}`)
+    }
+}
+
 </script>
 
 <template>
@@ -70,13 +91,15 @@ onMounted(() => {
                 <div>User: <strong>{{
                     userStore.user.nickname || userStore.user.username
                         }}</strong></div>
-                <el-dropdown placement="bottom-end">
+
+                <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="userStore.user.user_pic || avatar" />
                         <el-icon>
                             <CaretBottom />
                         </el-icon>
                     </span>
+
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item command="profile" :icon="User">My Account</el-dropdown-item>
