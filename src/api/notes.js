@@ -18,3 +18,12 @@ export const notesGetListService = (params) => request.get('/my/article/list', {
 
 // publish notes
 export const notesPublishService = (data) => request.post('/my/article/add', data)
+
+// get the details of notes
+export const notesGetDetailService = (id) => request.get('my/article/info', { params: { id } })
+
+// edit notes 
+export const notesEditService = (data) => request.put('my/article/info', data)
+
+//delete notes
+export const notesDelService = (id) => request.delete('my/article/info', { params: { id } })

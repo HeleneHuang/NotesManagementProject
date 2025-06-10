@@ -5,6 +5,7 @@ import ChannelSelect from './components/ChannelSelect.vue'
 import NotesEdit from './components/NotesEdit.vue'
 import { notesGetListService } from '@/api/notes'
 import { formatTime } from '@/utils/format'
+import { notesDelService } from '@/api/notes'
 
 const notesList = ref([])
 const total = ref(0)
@@ -50,6 +51,7 @@ const onReset = () => {
 }
 
 const notesEditRef = ref()
+
 // define the logic of edit and delete
 const onAddNotes = () => {
     notesEditRef.value.open({})
@@ -57,8 +59,15 @@ const onAddNotes = () => {
 const onEditNotes = (row) => {
     notesEditRef.value.open(row)
 }
-const onDeleteNotes = (row) => {
-    console.log(row)
+const onDeleteNotes = async (row) => {
+    await ElMessageBox.confirm('Do you want to delete the note?', 'Warning', {
+        type: 'warning',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    })
+    await notesDelService(row.id)
+    ElMessage({ type: 'success', message: 'Deleted Successfully' })
+    getNotesList()
 }
 
 // define the function when added and edited successfully

@@ -4,7 +4,9 @@ import ChannelSelect from './ChannelSelect.vue'
 import { Plus } from '@element-plus/icons-vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { notesPublishService } from '@/api/notes'
+import { notesPublishService, notesGetDetailService, notesEditService } from '@/api/notes'
+import { baseURL } from '@/utils/request'
+import axios from 'axios'
 
 // define the drawer
 const visibleDrawer = ref(false)
@@ -41,7 +43,10 @@ const onPublish = async (state) => {
 
     // tell the edit mode and the add mode
     if (formModel.value.id) {
-        console.log('编辑操作')
+        await notesEditService(fd)
+        ElMessage.success('Edited Successfully')
+        visibleDrawer.value = false
+        emit('success', 'edit')
     } else {
         await notesPublishService(fd)
         ElMessage.success('Added Successfully!')
@@ -50,15 +55,43 @@ const onPublish = async (state) => {
     }
 }
 
+// after using open, the drawer will open
 const editorRef = ref()
 const open = async (row) => {
-    visibleDrawer.value = true
+    visibleDrawer.value = true  // show the drawer
     if (row.id) {
-        console.log('编辑回显')
+        // redisplay the edited info
+        const res = await notesGetDetailService(row.id)
+        formModel.value = res.data.data
+        // the Avatar should be dealt with independently
+        imgUrl.value = baseURL + formModel.value.cover_img
+        // transfer the pic url to file object, it is easier to submit in the future
+        const file = await imageUrlToFile(imgUrl.value, formModel.value.cover_img)
+        formModel.value.cover_img = file
     } else {
         formModel.value = { ...defaultForm }
         imgUrl.value = ''
         editorRef.value.setHTML('')
+    }
+}
+
+// transfer the url to the filr object
+async function imageUrlToFile(url, fileName) {
+    try {
+        // use axios to get the data
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        const imageData = response.data;
+
+        // transfer the image data to blob
+        const blob = new Blob([imageData], { type: response.headers['content-type'] });
+
+        // create new file object
+        const file = new File([blob], fileName, { type: blob.type });
+
+        return file;
+    } catch (error) {
+        console.error('将图片转换为File对象时发生错误:', error);
+        throw error;
     }
 }
 
