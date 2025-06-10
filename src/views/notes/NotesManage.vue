@@ -7,6 +7,7 @@ import { formatTime } from '@/utils/format'
 
 const notesList = ref([])
 const total = ref(0)
+const loading = ref(false)
 
 const params = ref({
     pagenum: 1,
@@ -16,9 +17,11 @@ const params = ref({
 })
 
 const getNotesList = async () => {
+    loading.value = true
     const res = await notesGetListService(params.value)
     notesList.value = res.data.data
     total.value = res.data.total
+    loading.value = false
 }
 getNotesList()
 
@@ -30,6 +33,19 @@ const onSizeChange = (size) => {
 }
 const onCurrentChange = (page) => {
     params.value.pagenum = page
+    getNotesList()
+}
+
+// search and reset function
+const onSearch = () => {
+    params.value.pagenum = 1
+    getNotesList()
+}
+
+const onReset = () => {
+    params.value.pagenum = 1
+    params.value.cate_id = ''
+    params.value.state = ''
     getNotesList()
 }
 
@@ -59,12 +75,12 @@ const onDeleteNotes = (row) => {
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">Search</el-button>
-                <el-button>Reset</el-button>
+                <el-button @click="onSearch" type="primary">Search</el-button>
+                <el-button @click="onReset">Reset</el-button>
             </el-form-item>
         </el-form>
 
-        <el-table :data="notesList">
+        <el-table :data="notesList" loading.value=false>
             <el-table-column label="Notes Title" width="400">
                 <template #default="{ row }">
                     <el-link type="primary" :underline="false">{{ row.title }}</el-link>
