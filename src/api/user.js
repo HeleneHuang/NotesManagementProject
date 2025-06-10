@@ -12,3 +12,6 @@ export const userLoginService = ({username, password}) => {
 
 // get the basic information of customer
 export const userGetInfoService = () => request.get('/my/userinfo')
+
+// update the user's basic infomation
+export const userUpdateInfoService = ({ id, nickname, email }) => request.put('/my/userinfo', { id, nickname, email })
